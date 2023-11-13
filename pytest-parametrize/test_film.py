@@ -14,6 +14,7 @@ def setup_data():
     # Teardown: Clean up resources (if any) after the test
     print("\nTearing down resources...")
 
+# Tests using fixture
 def test_invalid_input(setup_data):
     anno = None
     origine = None
@@ -51,8 +52,8 @@ def test_per_anno_output_multiplo(setup_data):
     res = fs.get_film(anno, origine)
     assert len(expected) == len(res)
 
-
-@pytest.mark.parametrize("anno,origine,expected",[    
+# Tests using fixtire and parametrize
+@pytest.mark.parametrize("anno,origine,expected",[
     (2022, None, []),
     (2024, None, []),
     (2021, None, [
@@ -63,14 +64,38 @@ def test_per_anno_output_multiplo(setup_data):
         {'nome':'Ora ci arrabbiamo', 'anno':2001, 'origine':'Italia'},
     ])
 ])
-def test_film_per_anno(anno, origine, expected):
-    # Come usare la fixture per evitare la creazione di store?
-    store = [
-    {'nome':'Amaliè', 'anno':2001, 'origine':'Francia'},
-    {'nome':'Ora ci arrabbiamo', 'anno':2001, 'origine':'Italia'},
-    {'nome':'Noi testiamo sempre', 'anno':2023, 'origine':'Svizzera'},
-    {'nome':'Benvenuti all''Est', 'anno':2021, 'origine':'Francia'},
-        ]    
-    fs = FilmService(store)
+def test_film_per_anno(setup_data, anno, origine, expected): 
+    fs = FilmService(setup_data)
     res = fs.get_film(anno, origine)
     assert len(expected) == len(res)
+
+@pytest.mark.parametrize("anno,origine,expected",[
+    (None, 'Svezia', []),
+    (None, 'Francia', [
+        {'nome':'Benvenuti all''Est', 'anno':2021, 'origine':'Francia'},
+        {'nome':'Amaliè', 'anno':2001, 'origine':'Francia'},
+        ]),
+    (None, 'Italia', [
+        {'nome':'Ora ci arrabbiamo', 'anno':2001, 'origine':'Italia'},
+    ])
+])
+def test_film_per_origine(setup_data, anno, origine, expected): 
+    fs = FilmService(setup_data)
+    res = fs.get_film(anno, origine)
+    assert len(expected) == len(res)
+
+@pytest.mark.parametrize("anno,origine,expected",[
+    (2041, 'Indonesia', []),
+    (2041, 'Francia', []),
+    (2021, 'Svezia', []),
+    (2021, 'Francia', [
+        {'nome':'Benvenuti all''Est', 'anno':2021, 'origine':'Francia'}
+        ]),
+    (2001, 'Italia', [
+        {'nome':'Ora ci arrabbiamo', 'anno':2001, 'origine':'Italia'}
+    ])
+])
+def test_film_per_entrambi(setup_data, anno, origine, expected): 
+    fs = FilmService(setup_data)
+    res = fs.get_film(anno, origine)
+    assert len(expected) == len(res)    

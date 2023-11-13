@@ -7,11 +7,14 @@ class FilmService:
         if anno is None and origine is None:
             raise ValueError("Anno o paese di origine obbligatori")
         
-        if anno:
+        if anno and origine is None:
             return self._get_film_per_anno(anno)
         
-        if origine:
+        if origine and anno is None:
             return self._get_film_per_origine(origine)
+        
+        if origine and anno:
+            return self._get_film(anno, origine)
 
     def _get_film_per_anno(self, anno):
         film_list = []
@@ -27,6 +30,14 @@ class FilmService:
             if film.get('origine') == origine:
                 film_list.append(film)
         return film_list
+    
+    def _get_film(self, anno, origine):
+        film_list = []
+        for film in self.store:
+            if film.get('origine') == origine and film.get('anno') == anno:
+                film_list.append(film)
+        return film_list
+
     
 # if __name__ == "__main__":
 #     store = [
